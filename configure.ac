@@ -110,6 +110,27 @@ if test "$ac_cv_so_reuseport_works" = yes; then
   AC_DEFINE([SO_REUSEPORT_WORKS], [1], [Define if SO_REUSEPORT works])
 fi
 
+AC_CACHE_CHECK([whether TCP_LISTEN_TFO works],
+  [ac_cv_tcp_listen_tfo_works],
+  [AC_RUN_IFELSE(
+    [AC_LANG_PROGRAM([[
+#include <sys/types.h>
+#include <sys/socket.h>
+    ]], [[
+	int s = socket(AF_INET, SOCK_STREAM, 0);
+	int i = 5;
+	if (setsockopt(s, SOL_TCP, TCP_LISTEN_TFO, &i, sizeof i) < 0)
+	  return (1);
+	return (0);
+]])],
+  [ac_cv_tcp_listen_tfo_works=yes],
+  [ac_cv_tcp_listen_tfo_works=no])
+  ]
+)
+if test "$ac_cv_tcp_listen_tfo_works" = yes; then
+  AC_DEFINE([TCP_LISTEN_TFO_WORKS], [1], [Define if tcp_listen_tfo works])
+fi
+
 SH_TESTS="$(cd $srcdir/src && echo tests/test*.sh)"
 AC_SUBST(SH_TESTS)
 
